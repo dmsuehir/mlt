@@ -3,6 +3,7 @@
 Usage:
   mlt (-h | --help)
   mlt --version
+  mlt config
   mlt init [--template=<template>] <name>
   mlt build [--watch]
   mlt deploy
@@ -287,11 +288,44 @@ def templates_list():
 
   print(tabulate(table, headers=['Template', 'Description'], tablefmt="simple"))
 
+
+def check_global_config():
+  # Ensure presence of ~/.mlt directory
+  home = os.environ['HOME']
+  if not os.path.isdir(home):
+    print("Could not find user's home directory")
+    sys.exit(1)
+  
+  mlt_config_directory = home + '/.mlt'
+  if not os.path.isdir(mlt_config_directory):
+    os.mkdir(mlt_config_directory)
+
+  # Check whether ~/.mlt/config is present
+  mlt_config_file = mlt_config_directory + '/config'
+  if not os.path.isfile(mlt_config_file):
+    # Write template
+    # Open editor
+    with open(mlt_config_file,'w') as f:
+      f.write('''
+{
+  "container_push_prefix": "gcloud docker --",
+  "container_registry_address": "gcr.io/"
+}
+'''
+
+
 def main():
     args = docopt(__doc__, version="ML Container Templates v0.0.1")
 
+    if args["config"]:
+      config(args)
+      return
+
+    check_global_config()
+
     if args["init"]:
        init(args)
+       return
 
     if args["build"]:
       if not os.path.isfile('.studio.json'):
@@ -299,6 +333,7 @@ def main():
         sys.exit(1)
 
       build(args)
+      return
 
     if args["deploy"]:
       if not os.path.isfile('.studio.json'):
@@ -306,11 +341,14 @@ def main():
         sys.exit(1)
 
       deploy(args)
+      return
 
     if (args["template"] or args["templates"]) and args["list"]:
       templates_list()
+      return
 
     if args["undeploy"]:
       undeploy(args)
+      return
 
 main()
