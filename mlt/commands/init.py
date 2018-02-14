@@ -2,15 +2,15 @@ import os
 import sys
 import shutil
 from subprocess import check_output
+
+from mlt import TEMPLATES_DIR
 from mlt.utils import process_helpers
 
 
 def init(args):
-    template_directory = "/".join([os.path.dirname(__file__),
-                                   "..", "templates", args["--template"]])
-    app_name = args["<name>"]
-
     print(args)
+    template_directory = os.path.join(TEMPLATES_DIR, args["--template"])
+    app_name = args["<name>"]
     is_gke = args["--registry"] is None
 
     try:
@@ -21,25 +21,18 @@ def init(args):
                 ["gcloud", "config", "list", "--format",
                  "value(core.project)"])
             project = raw_project_bytes.decode("utf-8").strip()
-
-            with open(app_name + '/mlt.json', 'w') as f:
-                f.write('''
-{
-"name": "%s",
-"namespace": "%s",
-"gceProject": "%s"
-}
-    ''' % (app_name, app_name, project))
-
+            project_data = '"gceProject: "{}"'.format(project)
         else:
-            with open(app_name + '/mlt.json', 'w') as f:
-                f.write('''
+            project_data = '"registry: "{}"'.format(args["--registry"])
+
+        with open(os.path.join(app_name, 'mlt.json'), 'w') as f:
+            f.write('''
 {
-"name": "%s",
-"namespace": "%s",
-"registry": "%s"
+"name": "{}",
+"namespace": "{}",
+{}
 }
-    ''' % (app_name, app_name, args["--registry"]))
+'''.format(app_name, app_name, project_data))
 
         # Initialize new git repo in the project dir and commit initial state.
         process_helpers.run(["git", "init", app_name])
@@ -50,8 +43,8 @@ def init(args):
     except OSError as exc:
         if exc.errno == 17:
             print(
-                "Directory '%s' already exists: delete before trying to "
-                "initialize new application" % app_name)
+                "Directory '{}' already exists: delete before trying to "
+                "initialize new application".format(app_name))
         else:
             print(exc)
 

@@ -28,28 +28,25 @@ def main():
 
     if args["init"]:
         init.init(args)
-
-    if args["build"]:
+    elif args["build"]:
         if not os.path.isfile('mlt.json'):
             print("`mlt build` requires you to be in a `mlt init` "
                   "built directory.")
             sys.exit(1)
-
-        build.build(args)
-
-    if args["deploy"]:
+        else:
+            build.build(args)
+    elif args["deploy"]:
         if not os.path.isfile('mlt.json'):
-            print("`mlt build` requires you to be in a `mlt init` "
+            print("`mlt deploy` requires you to be in a `mlt init` "
                   "built directory.")
             sys.exit(1)
-
-        deploy.deploy(args)
-
-    if (args["template"] or args["templates"]) and args["list"]:
+        else:
+            deploy.deploy(args)
+    elif (args["template"] or args["templates"]) and args["list"]:
         templates.templates_list()
-
-    if args["undeploy"]:
+    elif args["undeploy"]:
         undeploy.undeploy(args)
 
 
-main()
+if __name__ == '__main__':
+    main()
