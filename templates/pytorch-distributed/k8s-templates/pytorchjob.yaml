@@ -1,6 +1,6 @@
-# TODO: THIS FILE
-apiVersion: "tensorflow.org/v1alpha1"
-kind: TfJob
+# TODO: what api version to use
+apiVersion: "pytorch/somethinghere"
+kind: PyTorchJob
 metadata:
   name: $app-$run
   labels:
@@ -8,14 +8,12 @@ metadata:
 spec:
   replicaSpecs:
     - replicas: 1
-      tfReplicaType: PS
-    - replicas: 1
       tfReplicaType: MASTER
       template:
         spec:
           containers:
             - image: $image
-              name: tensorflow
+              name: pytorch
           restartPolicy: OnFailure
     - replicas: 1
       tfReplicaType: WORKER
@@ -23,5 +21,5 @@ spec:
         spec:
           containers:
             - image: $image
-              name: tensorflow
+              name: pytorch
           restartPolicy: OnFailure
