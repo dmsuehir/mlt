@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# because pkg_resources is slow
+# also see https://github.com/pypa/setuptools/issues/510
+import fastentrypoints
 from setuptools import setup, find_packages
 
 setup(name='mlt',
@@ -7,8 +10,8 @@ setup(name='mlt',
       author='Intel Nervana',
       author_email='intelnervana@intel.com',
       url='http://www.intelnervana.com',
-      scripts=['mlt'],
-      packages=['mltlib'],
+      scripts=['bin/mlt'],
+      packages=['mlt'],
       classifiers=['Development Status :: 3 - Alpha',
                    'Environment :: Console',
                    'Intended Audience :: End Users/Desktop',
