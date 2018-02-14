@@ -7,6 +7,8 @@ from mlt import TEMPLATES_DIR
 from mlt.utils import process_helpers
 
 
+# TODO: debated using `git` package instead of calling out to git, but
+# git package takes a bit to import afair so didn't change it on first pass
 def init(args):
     print(args)
     template_directory = os.path.join(TEMPLATES_DIR, args["--template"])
@@ -26,12 +28,11 @@ def init(args):
             project_data = '"registry: "{}"'.format(args["--registry"])
 
         with open(os.path.join(app_name, 'mlt.json'), 'w') as f:
-            f.write('''
-{
+            f.write('''{{
 "name": "{}",
 "namespace": "{}",
 {}
-}
+}}
 '''.format(app_name, app_name, project_data))
 
         # Initialize new git repo in the project dir and commit initial state.

@@ -16,6 +16,7 @@ def build(args):
     if args['--watch']:
         event_handler = EventHandler(do_build, args)
         observer = Observer()
+        # TODO: what dir was this?
         observer.schedule(event_handler, './', recursive=True)
         observer.start()
         try:
@@ -33,12 +34,14 @@ def build(args):
 def do_build(args):
     last_build_duration = None
     if os.path.isfile('.build.json'):
-        status = json.load(open('.build.json'))
+        with open('.build.json') as f:
+            status = json.load(f)
         last_build_duration = status['last_build_duration']
 
     started_build_time = time.time()
 
-    config = json.load(open('mlt.json'))
+    with open('mlt.json') as f:
+        config = json.load(f)
     app_name = config['name']
 
     container_id = str(uuid.uuid4())
