@@ -4,12 +4,12 @@ import json
 import uuid
 import sys
 
-from subprocess import Popen, PIPE, STDOUT
 from watchdog.observers import Observer
 from termcolor import colored
 
 from mlt.utils import progress_bar
 from mlt.event_handler import EventHandler
+from mlt.utils.process_helpers import run_popen
 
 
 def build(args):
@@ -44,19 +44,16 @@ def do_build(args):
         config = json.load(f)
     app_name = config['name']
 
-    container_id = str(uuid.uuid4())
-    container_name = app_name + ":" + container_id
+    container_name = "{}:{}".format(app_name, uuid.uuid4())
 
-    print("Starting build %s" % container_name)
+    print("Starting build {}".format(container_name))
 
     # Add bar
-    build_process = Popen(["docker", "build", "-t", container_name, "."],
-                          stdout=PIPE, stderr=STDOUT)
+    build_process = run_popen(["docker", "build", "-t", container_name, "."])
 
-    def build_is_done():
-        return build_process.poll() is not None
     progress_bar.duration_progress(
-        'Building', last_build_duration, build_is_done)
+        'Building', last_build_duration,
+        lambda: build_process.poll() is not None)
     if build_process.poll() != 0:
         print(colored(build_process.communicate()[0], 'red'))
         sys.exit(1)
@@ -70,4 +67,4 @@ def do_build(args):
             "last_build_duration": built_time - started_build_time
         }))
 
-    print("Built %s" % container_name)
+    print("Built {}".format(container_name))

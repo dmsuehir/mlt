@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import shutil
@@ -18,22 +19,18 @@ def init(args):
     try:
         shutil.copytree(template_directory, app_name)
 
+        data = {'name': app_name, 'namespace': app_name}
         if is_gke:
             raw_project_bytes = check_output(
                 ["gcloud", "config", "list", "--format",
                  "value(core.project)"])
             project = raw_project_bytes.decode("utf-8").strip()
-            project_data = '"gceProject: "{}"'.format(project)
+            data['gceProject'] = project
         else:
-            project_data = '"registry: "{}"'.format(args["--registry"])
+            data['registry'] = args["--registry"]
 
         with open(os.path.join(app_name, 'mlt.json'), 'w') as f:
-            f.write('''{{
-"name": "{}",
-"namespace": "{}",
-{}
-}}
-'''.format(app_name, app_name, project_data))
+            f.write(json.dumps(data, f, indent=2))
 
         # Initialize new git repo in the project dir and commit initial state.
         process_helpers.run(["git", "init", app_name])
