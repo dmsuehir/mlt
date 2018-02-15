@@ -10,7 +10,8 @@ def undeploy(args):
         print("run `mlt undeploy` within a project directory")
         sys.exit(1)
 
-    config = json.load(open('mlt.json'))
+    with open('mlt.json') as f:
+        config = json.load(f)
     namespace = config['namespace']
     process_helpers.run(
         ["kubectl", "--namespace", namespace, "delete", "-f", "k8s"])
