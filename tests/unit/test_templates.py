@@ -1,4 +1,4 @@
-from mlt import templates
+from mlt.commands import templates
 
 
 def test_template_list():

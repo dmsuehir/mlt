@@ -1,18 +1,42 @@
-.PHONY: env
+PY_VERSION := 2
+VIRTUALENV_EXE=$(if $(subst 2,,$(PY_VERSION)),python3 -m venv,virtualenv)
+VIRTUALENV_DIR=$(if $(subst 2,,$(PY_VERSION)),.venv3,.venv)
+ACTIVATE="$(VIRTUALENV_DIR)/bin/activate"
 
-all: env
+.PHONY: venv
 
-env: requirements.txt
-	virtualenv env && . ./env/bin/activate && pip install -r requirements.txt && pip install -e .
+all: venv
 
-dev-env: requirements.txt requirements-dev.txt
-	virtualenv env && . ./env/bin/activate && pip install -r requirements.txt -r requirements-dev.txt && pip install -e .
+$(ACTIVATE): requirements.txt requirements-dev.txt
+	@echo "Updating virtualenv dependencies in: $(VIRTUALENV_DIR)..."
+	@test -d $(VIRTUALENV_DIR) || $(VIRTUALENV_EXE) $(VIRTUALENV_DIR)
+	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -U pip
+	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -r requirements.txt -r requirements-dev.txt
+	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -e .
+	@touch $(ACTIVATE)
 
-lint: dev-env
-	. ./env/bin/activate && flake8 bin/mlt mlt
+venv: $(ACTIVATE)
+	@echo -n "Using "
+	@. $(ACTIVATE) && python --version
 
-test: lint
-	py.test -v tests/unit
+venv2: venv
+
+venv3: PY_VERSION=3
+venv3: $(ACTIVATE)
+	@echo -n "Using "
+	@. $(ACTIVATE) && python3 --version
+
+lint: venv
+	. $(ACTIVATE) && flake8 bin/mlt mlt
+
+unit_test: venv
+	@echo "Running unit tests..."
+	@. $(ACTIVATE) && py.test -v tests/unit
+
+test: lint unit_test
+
+test3: PY_VERSION=3
+test3: test
 
 docker:
 	docker build -t mlt .
@@ -30,4 +54,4 @@ test-e2e: env-up
 	docker-compose exec test py.test -v tests/e2e
 
 clean:
-	rm -rf env
+	rm -rf .venv
