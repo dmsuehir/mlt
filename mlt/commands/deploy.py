@@ -17,25 +17,27 @@ def deploy(args):
 
     do_push(args)
 
-    config = json.load(open('mlt.json'))
+    with open('mlt.json') as f:
+        config = json.load(f)
     app_name = config['name']
     namespace = config['namespace']
 
-    status = json.load(open('.push.json'))
+    with open('.push.json') as f:
+        status = json.load(f)
     remote_container_name = status['last_remote_container']
     run_id = str(uuid.uuid4())
 
-    print("Deploying %s" % remote_container_name)
+    print("Deploying {}".format(remote_container_name))
 
     # Write new container to deployment
     for filename in os.listdir("k8s-templates"):
-        with open('k8s-templates/' + filename) as f:
+        with open(os.path.join('k8s-templates', filename)) as f:
             deployment_template = f.read()
-            s = Template(deployment_template)
-            out = s.substitute(image=remote_container_name,
-                               app=app_name, run=run_id)
+            template = Template(deployment_template)
+            out = template.substitute(image=remote_container_name,
+                                      app=app_name, run=run_id)
 
-            with open('k8s/' + filename, 'w') as f:
+            with open(os.path.join('k8s', filename), 'w') as f:
                 f.write(out)
 
         kubernetes_helpers.ensure_namespace_exists(namespace)
@@ -43,24 +45,29 @@ def deploy(args):
             ["kubectl", "--namespace", namespace, "apply", "-R", "-f", "k8s"])
 
         print("\nInspect created objects by running:\n"
-              "$ kubectl get --namespace=%s all\n" % namespace)
+              "$ kubectl get --namespace={} all\n".format(namespace))
 
 
 def do_push(args):
     last_push_duration = None
     if os.path.isfile('.push.json'):
-        status = json.load(open('.push.json'))
+        with open('.push.json') as f:
+            status = json.load(f)
         last_push_duration = status['last_push_duration']
 
     container_name = None
+    # TODO: probably don't have to worry about this since `deploy` calls
+    # build if there's no build step yet
     if os.path.isfile('.build.json'):
-        status = json.load(open('.build.json'))
+        with open('.build.json') as f:
+            status = json.load(f)
         container_name = status['last_container']
     else:
         print("Need to run build before pushing")
         sys.exit(1)
 
-    config = json.load(open('mlt.json'))
+    with open('mlt.json') as f:
+        config = json.load(f)
 
     is_gke = ('gceProject' in config)
 
@@ -82,10 +89,9 @@ def do_push(args):
             ["docker", "push", remote_container_name],
             stdout=PIPE, stderr=PIPE)
 
-    def push_is_done():
-        return push_process.poll() is not None
     progress_bar.duration_progress(
-        'Pushing ', last_push_duration, push_is_done)
+        'Pushing ', last_push_duration,
+        lambda: push_process.poll() is not None)
     if push_process.poll() != 0:
         print(colored(push_process.communicate()[0], 'red'))
         sys.exit(1)
@@ -98,4 +104,4 @@ def do_push(args):
             "last_push_duration": pushed_time - started_push_time
         }))
 
-    print("Pushed to %s" % remote_container_name)
+    print("Pushed to {}".format(remote_container_name))
