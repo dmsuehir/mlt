@@ -13,7 +13,7 @@ jobs:
             apt-get update
             apt-get install -y python python-pip
             pip install virtualenv pytest
-            make dev-env
+            make venv
 
       - run:
           name: lint tests
@@ -26,7 +26,7 @@ jobs:
             set -x
             pip install -r requirements.txt
             pip install -e .
-            make test
+            make unit_test
 
       - run:
           name: Installing dependencies
