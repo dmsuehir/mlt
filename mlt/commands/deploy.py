@@ -16,7 +16,7 @@ class Deploy(Command):
         if not os.path.isfile('.build.json'):
             Build().do_build(args)
 
-        self.do_push(args)
+        self.push(args)
 
         with open('mlt.json') as f:
             config = json.load(f)
@@ -49,8 +49,9 @@ class Deploy(Command):
             print("\nInspect created objects by running:\n"
                   "$ kubectl get --namespace={} all\n".format(namespace))
 
-    def do_push(self, args):
+    def push(self, args):
         last_push_duration = None
+        # TODO: better name for this file, and not local path-specific
         if os.path.isfile('.push.json'):
             with open('.push.json') as f:
                 status = json.load(f)
@@ -70,7 +71,7 @@ class Deploy(Command):
         with open('mlt.json') as f:
             config = json.load(f)
 
-        is_gke = ('gceProject' in config)
+        is_gke = 'gceProject' in config
 
         if is_gke:
             remote_container_name = "gcr.io/" + \
