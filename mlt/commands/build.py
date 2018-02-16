@@ -18,6 +18,10 @@ class Build(Command):
         """creates docker images
            if `--watch` is passed, continually will build on change
         """
+        if not os.path.isfile('mlt.json'):
+            print("`mlt build` requires you to be in a `mlt init` "
+                  "built directory.")
+            sys.exit(1)
         if args['--watch']:
             event_handler = EventHandler(self.do_build, args)
             observer = Observer()

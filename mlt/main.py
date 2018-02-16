@@ -56,23 +56,3 @@ def main():
         if os.environ.get('MLT_DEBUG', '') != '':
             import traceback
             traceback.print_exc()
-    # if args["init"]:
-    #     init.init(args)
-    # elif args["build"]:
-    #     if not os.path.isfile('mlt.json'):
-    #         print("`mlt build` requires you to be in a `mlt init` "
-    #               "built directory.")
-    #         sys.exit(1)
-    #     else:
-    #         build.build(args)
-    # elif args["deploy"]:
-    #     if not os.path.isfile('mlt.json'):
-    #         print("`mlt deploy` requires you to be in a `mlt init` "
-    #               "built directory.")
-    #         sys.exit(1)
-    #     else:
-    #         deploy.deploy(args)
-    # elif (args["template"] or args["templates"]) and args["list"]:
-    #     templates.templates_list()
-    # elif args["undeploy"]:
-    #     undeploy.undeploy(args)

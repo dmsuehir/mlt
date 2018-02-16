@@ -13,6 +13,10 @@ from mlt.utils import process_helpers, progress_bar, kubernetes_helpers
 
 class Deploy(Command):
     def action(self, args):
+        if not os.path.isfile('mlt.json'):
+            print("`mlt deploy` requires you to be in a `mlt init` "
+                  "built directory.")
+            sys.exit(1)
         if not os.path.isfile('.build.json'):
             Build().do_build(args)
 
