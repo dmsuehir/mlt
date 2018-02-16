@@ -7,10 +7,11 @@ ACTIVATE="$(VIRTUALENV_DIR)/bin/activate"
 
 all: venv
 
+
 $(ACTIVATE): requirements.txt requirements-dev.txt
 	@echo "Updating virtualenv dependencies in: $(VIRTUALENV_DIR)..."
 	@test -d $(VIRTUALENV_DIR) || $(VIRTUALENV_EXE) $(VIRTUALENV_DIR)
-	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -U pip
+	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -U pip setuptools
 	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -r requirements.txt -r requirements-dev.txt
 	@. $(ACTIVATE) && python$(PY_VERSION) -m pip install -e .
 	@touch $(ACTIVATE)

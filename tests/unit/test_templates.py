@@ -1,6 +1,6 @@
-from mlt.commands import templates
+from mlt.commands.templates import Template
 
 
 def test_template_list():
-    table = templates.parse_templates()
-    assert table is not None
+    template = Template()
+    assert template.template_list() is not None
