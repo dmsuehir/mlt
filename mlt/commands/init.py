@@ -16,38 +16,42 @@ class Init(Command):
         """creates a new mlt git package in the current folder"""
         print(args)
         template_directory = os.path.join(TEMPLATES_DIR, args["--template"])
-        app_name = args["<name>"]
-        is_gke = args["--registry"] is None
+        self.app_name = args["<name>"]
 
         try:
-            shutil.copytree(template_directory, app_name)
-
-            data = {'name': app_name, 'namespace': app_name}
-            if is_gke:
-                raw_project_bytes = check_output(
-                    ["gcloud", "config", "list", "--format",
-                     "value(core.project)"])
-                project = raw_project_bytes.decode("utf-8").strip()
-                data['gceProject'] = project
-            else:
-                data['registry'] = args["--registry"]
-
-            with open(os.path.join(app_name, 'mlt.json'), 'w') as f:
+            shutil.copytree(template_directory, self.app_name)
+            data = self._build_mlt_json()
+            with open(os.path.join(self.app_name, 'mlt.json'), 'w') as f:
                 f.write(json.dumps(data, f, indent=2))
-
-            # Initialize new git repo in the project dir
-            # and commit initial state.
-            process_helpers.run(["git", "init", app_name])
-            process_helpers.run(["git", "add", "."], cwd=app_name)
-            print(process_helpers.run(
-                ["git", "commit", "-m", "Initial commit."], cwd=app_name))
-
+            self._init_git_repo()
         except OSError as exc:
             if exc.errno == 17:
                 print(
                     "Directory '{}' already exists: delete before trying to "
-                    "initialize new application".format(app_name))
+                    "initialize new application".format(self.app_name))
             else:
                 print(exc)
 
             sys.exit(1)
+
+    def _build_mlt_json(self):
+        """generates the data to write to mlt.json"""
+        data = {'name': self.app_name, 'namespace': self.app_name}
+        if args["--registry"] is None:
+            raw_project_bytes = check_output(
+                ["gcloud", "config", "list", "--format",
+                 "value(core.project)"])
+            project = raw_project_bytes.decode("utf-8").strip()
+            data['gceProject'] = project
+        else:
+            data['registry'] = args["--registry"]
+        return data
+
+    def _init_git_repo(self):
+        """
+        Initialize new git repo in the project dir and commit initial state.
+        """
+        process_helpers.run(["git", "init", self.app_name])
+        process_helpers.run(["git", "add", "."], cwd=self.app_name)
+        print(process_helpers.run(
+            ["git", "commit", "-m", "Initial commit."], cwd=self.app_name))

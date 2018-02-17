@@ -7,53 +7,26 @@ import sys
 from watchdog.observers import Observer
 from termcolor import colored
 
-from mlt.commands import Command
+from mlt.commands import NeedsInitCommand
 from mlt.event_handler import EventHandler
 from mlt.utils import progress_bar
 from mlt.utils.process_helpers import run_popen
 
 
-class Build(Command):
+class Build(NeedsInitCommand):
     def action(self, args):
         """creates docker images
            if `--watch` is passed, continually will build on change
         """
-        if not os.path.isfile('mlt.json'):
-            print("`mlt build` requires you to be in a `mlt init` "
-                  "built directory.")
-            sys.exit(1)
-        if args['--watch']:
-            event_handler = EventHandler(self.do_build, args)
-            observer = Observer()
-            # TODO: what dir was this?
-            observer.schedule(event_handler, './', recursive=True)
-            observer.start()
-            try:
-                while True:
-                    time.sleep(1)
+        self._watch_and_build(args) if args['--watch'] else self_build(args)
 
-            except KeyboardInterrupt:
-                observer.stop()
-            observer.join()
-
-        else:
-            self.do_build(args)
-
-    def do_build(self, args):
-        last_build_duration = None
-        if os.path.isfile('.build.json'):
-            with open('.build.json') as f:
-                status = json.load(f)
-            last_build_duration = status['last_build_duration']
+    def _build(self, args):
+        last_build_duration = self._fetch_action_arg(
+            'build', 'last_build_duration')
 
         started_build_time = time.time()
 
-        with open('mlt.json') as f:
-            config = json.load(f)
-        app_name = config['name']
-
-        container_name = "{}:{}".format(app_name, uuid.uuid4())
-
+        container_name = "{}:{}".format(self.config['name'], uuid.uuid4())
         print("Starting build {}".format(container_name))
 
         # Add bar
@@ -77,3 +50,17 @@ class Build(Command):
             }))
 
         print("Built {}".format(container_name))
+
+    def _watch_and_build(self, args):
+        event_handler = EventHandler(self._build, args)
+        observer = Observer()
+        # TODO: what dir was this?
+        observer.schedule(event_handler, './', recursive=True)
+        observer.start()
+        try:
+            while True:
+                time.sleep(1)
+
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
