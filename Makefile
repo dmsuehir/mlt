@@ -30,9 +30,15 @@ venv3: $(ACTIVATE)
 lint: venv
 	. $(ACTIVATE) && flake8 bin/mlt mlt
 
+lint3: PY_VERSION=3
+lint3: lint
+
 unit_test: venv
 	@echo "Running unit tests..."
 	@. $(ACTIVATE) && py.test -v tests/unit
+
+unit_test3: PY_VERSION=3
+unit_test3: unit_test
 
 test: lint unit_test
 

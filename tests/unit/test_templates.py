@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from cStringIO import StringIO  # won't work in python3
+from io import StringIO     # if only python3 supported cStringIO...
 import sys
 from mlt.commands.templates import Templates
 
@@ -16,4 +16,4 @@ def test_template_list():
     templates = Templates({'template': True, 'list': True})
     with catch_stdout() as caught_output:
         templates.action()
-    assert caught_output is not None
+    assert caught_output.getvalue() is not None

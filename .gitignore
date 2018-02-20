@@ -1,4 +1,5 @@
 .venv/
+.venv3
 .Python
 pip-selfcheck.json
 .vscode
