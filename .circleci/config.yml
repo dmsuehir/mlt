@@ -12,7 +12,9 @@ jobs:
           command: |
             apt-get update
             apt-get install -y python python-pip
-            pip install virtualenv pytest
+            apt-get install -y python3 python3-pip
+            python2 -m pip install virtualenv pytest
+            python3 -m pip install virtualenv pytest
 
       - run:
           name: lint tests
