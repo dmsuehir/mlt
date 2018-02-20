@@ -10,7 +10,8 @@ class Templates(Command):
         """lists templates available"""
         self._parse_templates()
         print(tabulate(self.table,
-                       headers=['Template', 'Description'], tablefmt="simple"))
+                       headers=['Template', 'Description'],
+                       tablefmt="simple"))
 
     def _parse_templates(self, templates_directory=TEMPLATES_DIR):
         self.table = []
