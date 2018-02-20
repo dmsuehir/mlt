@@ -5,8 +5,8 @@ try:
 except ImportError:
     # python 3
     # only supports unicode so can't be used in python 2 for sys.stdout
-    # theory: `print` converts to `str` when appending newline, which it then
-    # passes on to `sys.stdout.write`, throwing a type error
+    # because (from `print` documentation)
+    # "All non-keyword arguments are converted to strings like str() does"
     from io import StringIO
 import sys
 from mlt.commands.templates import Templates
