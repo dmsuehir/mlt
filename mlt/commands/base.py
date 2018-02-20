@@ -19,7 +19,7 @@ class Command(object):
             if os.path.isfile(action_json):
                 with open(action_json) as f:
                     self._file_contents[action_json] = json.load(f)
-        desired_arg = self._file_contents[action_json][arg]
+        desired_arg = self._file_contents.get(action_json, {}).get(arg)
         return desired_arg
 
 
