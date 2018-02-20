@@ -35,10 +35,8 @@ lint3: lint
 
 unit_test: venv
 	@echo "Running unit tests..."
-	@export LC_ALL="en_US.UTF-8"
-	@export LC_CTYPE="en_US.UTF-8"
-	@dpkg-reconfigure locales
-	@. $(ACTIVATE) && py.test -v --pdb tests/unit
+	@export LC_ALL="en_US.UTF-8" && export LC_CTYPE="en_US.UTF-8" && dpkg-reconfigure locales || true
+	@. $(ACTIVATE) && pytest -v --pdb tests/unit
 
 unit_test3: PY_VERSION=3
 unit_test3: unit_test
