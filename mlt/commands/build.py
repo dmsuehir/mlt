@@ -1,4 +1,3 @@
-import os
 import time
 import json
 import uuid
@@ -18,7 +17,7 @@ class Build(NeedsInitCommand):
         """creates docker images
            if `--watch` is passed, continually will build on change
         """
-        self._watch_and_build(args) if args['--watch'] else self_build(args)
+        self._watch_and_build(args) if args['--watch'] else self._build(args)
 
     def _build(self, args):
         last_build_duration = self._fetch_action_arg(

@@ -15,7 +15,7 @@ class Command(object):
         desired_arg = None
         action_json = '.{}.json'.format(action)
         # check if we have the json cached or not
-        if not action_json in self._file_contents:
+        if action_json not in self._file_contents:
             if os.path.isfile(action_json):
                 with open(action_json) as f:
                     self._file_contents[action_json] = json.load(f)

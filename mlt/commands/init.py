@@ -20,7 +20,7 @@ class Init(Command):
 
         try:
             shutil.copytree(template_directory, self.app_name)
-            data = self._build_mlt_json()
+            data = self._build_mlt_json(args)
             with open(os.path.join(self.app_name, 'mlt.json'), 'w') as f:
                 f.write(json.dumps(data, f, indent=2))
             self._init_git_repo()
@@ -34,7 +34,7 @@ class Init(Command):
 
             sys.exit(1)
 
-    def _build_mlt_json(self):
+    def _build_mlt_json(self, args):
         """generates the data to write to mlt.json"""
         data = {'name': self.app_name, 'namespace': self.app_name}
         if args["--registry"] is None:

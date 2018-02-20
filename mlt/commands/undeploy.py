@@ -1,7 +1,3 @@
-import os
-import sys
-import json
-
 from mlt.commands import NeedsInitCommand
 from mlt.utils import process_helpers
 

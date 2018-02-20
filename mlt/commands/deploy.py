@@ -44,7 +44,8 @@ class Deploy(NeedsInitCommand, NeedsBuildCommand):
     def _push(self, args):
         last_push_duration = self._fetch_action_arg(
             'push', 'last_push_duration')
-        container_name = self._fetch_action_arg('push', 'last_container')
+        self.container_name = self._fetch_action_arg(
+            'push', 'last_container')
 
         if 'gceProject' in self.config:
             self._push_gke()
@@ -53,36 +54,36 @@ class Deploy(NeedsInitCommand, NeedsBuildCommand):
 
         progress_bar.duration_progress(
             'Pushing ', last_push_duration,
-            lambda: push_process.poll() is not None)
-        if push_process.poll() != 0:
-            print(colored(push_process.communicate()[0], 'red'))
+            lambda: self.push_process.poll() is not None)
+        if self.push_process.poll() != 0:
+            print(colored(self.push_process.communicate()[0], 'red'))
             sys.exit(1)
 
         with open('.push.json', 'w') as f:
             f.write(json.dumps({
-                "last_remote_container": remote_container_name,
+                "last_remote_container": self.remote_container_name,
                 "last_push_duration": time.time() - self.started_push_time
             }))
 
-        print("Pushed to {}".format(remote_container_name))
+        print("Pushed to {}".format(self.remote_container_name))
 
     def _push_gke(self):
-        remote_container_name = "gcr.io/" + \
-            self.config['gceProject'] + "/" + container_name
+        self.remote_container_name = "gcr.io/" + \
+            self.config['gceProject'] + "/" + self.container_name
         self._start_push_time_and_tag()
-        push_process = Popen(["gcloud", "docker", "--", "push",
-                              remote_container_name],
-                             stdout=PIPE, stderr=PIPE)
+        self.push_process = Popen(["gcloud", "docker", "--", "push",
+                                   self.remote_container_name],
+                                  stdout=PIPE, stderr=PIPE)
 
     def _push_docker(self):
-        remote_container_name = self.config['registry'] + \
-            "/" + container_name
+        self.remote_container_name = self.config['registry'] + \
+            "/" + self.container_name
         self._start_push_time_and_tag()
-        push_process = Popen(
-            ["docker", "push", remote_container_name],
+        self.push_process = Popen(
+            ["docker", "push", self.remote_container_name],
             stdout=PIPE, stderr=PIPE)
 
     def _start_push_time_and_tag(self):
         self.started_push_time = time.time()
         process_helpers.run(
-            ["docker", "tag", container_name, remote_container_name])
+            ["docker", "tag", self.container_name, self.remote_container_name])
