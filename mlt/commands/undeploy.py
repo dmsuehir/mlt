@@ -3,7 +3,7 @@ from mlt.utils import process_helpers
 
 
 class Undeploy(NeedsInitCommand):
-    def action(self, args):
+    def action(self):
         """deletes current kubernetes namespace"""
         namespace = self.config['namespace']
         process_helpers.run(

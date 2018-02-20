@@ -6,7 +6,7 @@ from mlt.commands import Command
 
 
 class Templates(Command):
-    def action(self, args):
+    def action(self):
         """lists templates available"""
         self._parse_templates()
         print(tabulate(self.table,

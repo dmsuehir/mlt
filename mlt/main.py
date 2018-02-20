@@ -36,7 +36,7 @@ def run_command(args):
     """maps params from docopt into mlt commands"""
     for command, CommandClass in COMMAND_MAP:
         if args[command]:
-            CommandClass().action(args)
+            CommandClass(args).action()
             return
 
 

@@ -13,13 +13,13 @@ from mlt.utils.process_helpers import run_popen
 
 
 class Build(NeedsInitCommand):
-    def action(self, args):
+    def action(self):
         """creates docker images
            if `--watch` is passed, continually will build on change
         """
-        self._watch_and_build(args) if args['--watch'] else self._build(args)
+        self._watch_and_build() if self.args['--watch'] else self._build()
 
-    def _build(self, args):
+    def _build(self):
         last_build_duration = self._fetch_action_arg(
             'build', 'last_build_duration')
 
@@ -50,8 +50,8 @@ class Build(NeedsInitCommand):
 
         print("Built {}".format(container_name))
 
-    def _watch_and_build(self, args):
-        event_handler = EventHandler(self._build, args)
+    def _watch_and_build(self):
+        event_handler = EventHandler(self._build)
         observer = Observer()
         # TODO: what dir was this?
         observer.schedule(event_handler, './', recursive=True)

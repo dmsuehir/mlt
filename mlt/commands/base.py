@@ -4,11 +4,12 @@ import sys
 
 
 class Command(object):
-    def __init__(self):
+    def __init__(self, args):
         # will store the build and push file json
         self._file_contents = {}
+        self.args = args
 
-    def action(self, args):
+    def action(self):
         raise NotImplementedError()
 
     def _fetch_action_arg(self, action, arg):
@@ -29,10 +30,10 @@ class NeedsInitCommand(Command):
     from Init
     """
 
-    def __init__(self):
+    def __init__(self, args):
         self._verify_init()
         self._load_config()
-        super(NeedsInitCommand, self).__init__()
+        super(NeedsInitCommand, self).__init__(args)
 
     def _verify_init(self):
         if not os.path.isfile('mlt.json'):
@@ -40,6 +41,8 @@ class NeedsInitCommand(Command):
                   "built directory.")
             sys.exit(1)
 
+    # TODO: see if can combine this with _fetch_action_arg
+    # to see if it's even necessary to prefetch
     def _load_config(self):
         with open('mlt.json') as f:
             self.config = json.load(f)
@@ -56,4 +59,4 @@ class NeedsBuildCommand(Command):
         if not os.path.isfile('.build.json'):
             # TODO: see if there's a way to get rid of circular import here
             from mlt.commands.build import Build
-            Build().action(args)
+            Build(self.args).action()

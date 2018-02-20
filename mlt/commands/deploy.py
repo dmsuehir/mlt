@@ -12,8 +12,8 @@ from mlt.utils import process_helpers, progress_bar, kubernetes_helpers
 
 
 class Deploy(NeedsInitCommand, NeedsBuildCommand):
-    def action(self, args):
-        self._push(args)
+    def action(self):
+        self._push()
 
         app_name = self.config['name']
         namespace = self.config['namespace']
@@ -41,7 +41,7 @@ class Deploy(NeedsInitCommand, NeedsBuildCommand):
             print("\nInspect created objects by running:\n"
                   "$ kubectl get --namespace={} all\n".format(namespace))
 
-    def _push(self, args):
+    def _push(self):
         last_push_duration = self._fetch_action_arg(
             'push', 'last_push_duration')
         self.container_name = self._fetch_action_arg(
