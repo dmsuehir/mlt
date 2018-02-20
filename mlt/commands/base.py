@@ -5,22 +5,21 @@ import sys
 
 class Command(object):
     def __init__(self):
-        pass
+        # will store the build and push file json
+        self._file_contents = {}
 
     def action(self, args):
         raise NotImplementedError()
 
-    # TODO: remove this
-    def _get_push_status(self):
-        with open('.push.json') as f:
-            return = json.load(f)
-
     def _fetch_action_arg(self, action, arg):
         desired_arg = None
         action_json = '.{}.json'.format(action)
-        if os.path.isfile(action_json):
-            with open(action_json) as f:
-                desired_arg = json.load(f)[arg]
+        # check if we have the json cached or not
+        if not action_json in self._file_contents:
+            if os.path.isfile(action_json):
+                with open(action_json) as f:
+                    self._file_contents[action_json] = json.load(f)
+        desired_arg = self._file_contents[action_json][arg]
         return desired_arg
 
 

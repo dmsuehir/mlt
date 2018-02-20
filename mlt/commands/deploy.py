@@ -18,8 +18,8 @@ class Deploy(NeedsInitCommand, NeedsBuildCommand):
         app_name = self.config['name']
         namespace = self.config['namespace']
 
-        status = self._get_push_status()
-        remote_container_name = status['last_remote_container']
+        remote_container_name = self._fetch_action_arg(
+            'push', 'last_remote_container')
 
         print("Deploying {}".format(remote_container_name))
 
