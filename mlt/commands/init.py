@@ -14,7 +14,6 @@ class Init(Command):
     # git package takes a bit to import afair so didn't change it on first pass
     def action(self):
         """creates a new mlt git package in the current folder"""
-        print(self.args)
         template_directory = os.path.join(
             TEMPLATES_DIR, self.args["--template"])
         self.app_name = self.args["<name>"]

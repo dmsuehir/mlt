@@ -13,15 +13,13 @@ class Command(object):
         raise NotImplementedError()
 
     def _fetch_action_arg(self, action, arg):
-        desired_arg = None
         action_json = '.{}.json'.format(action)
         # check if we have the json cached or not
         if action_json not in self._file_contents:
             if os.path.isfile(action_json):
                 with open(action_json) as f:
                     self._file_contents[action_json] = json.load(f)
-        desired_arg = self._file_contents.get(action_json, {}).get(arg)
-        return desired_arg
+        return self._file_contents.get(action_json, {}).get(arg)
 
 
 class NeedsInitCommand(Command):

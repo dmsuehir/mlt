@@ -16,9 +16,11 @@ from mlt.commands.templates import Templates
 def catch_stdout():
     _stdout = sys.stdout
     sys.stdout = caught_output = StringIO()
-    yield caught_output
-    sys.stdout = _stdout
-    caught_output.close()
+    try:
+        yield caught_output
+    finally:
+        sys.stdout = _stdout
+        caught_output.close()
 
 
 def test_template_list():

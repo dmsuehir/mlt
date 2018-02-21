@@ -61,4 +61,4 @@ test-e2e: env-up
 	docker-compose exec test py.test -v tests/e2e
 
 clean:
-	rm -rf .venv
+	rm -rf .venv .venv3
