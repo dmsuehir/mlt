@@ -1,4 +1,4 @@
-# mlt
+# mlt :)
 Machine Learning Container Tool
 
 `mlt` aids in the creation of containers for machine learning jobs.
