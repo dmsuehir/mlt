@@ -22,7 +22,11 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-hello = tf.constant('Hello, TensorFlow!')
+FLAGS = tf.app.flags.FLAGS
+
+tf.app.flags.DEFINE_string("greeting", "Hello", "Greeting to use")
+
+hello = tf.constant('{}, TensorFlow!'.format(FLAGS.greeting))
 
 # Start tf session
 sess = tf.Session()

@@ -28,7 +28,7 @@ import traceback
 
 from mlt import TEMPLATES_DIR
 from mlt.commands import Command
-from mlt.utils import process_helpers, git_helpers
+from mlt.utils import process_helpers, git_helpers, files
 
 
 class InitCommand(Command):
@@ -64,6 +64,17 @@ class InitCommand(Command):
 
                 sys.exit(1)
 
+    def _get_template_parameters(self):
+        """
+        Returns template-specific parameters from the parameters.json file
+        """
+        parameters_file = "parameters.json"
+
+        if os.path.isfile(parameters_file):
+            with open(parameters_file) as f:
+                return json.load(f).get("parameters")
+        return None
+
     def _build_mlt_json(self):
         """generates the data to write to mlt.json"""
         data = {'name': self.app_name, 'namespace': self.app_name}
@@ -79,6 +90,12 @@ class InitCommand(Command):
             data['namespace'] = getpass.getuser()
         else:
             data['namespace'] = self.args["--namespace"]
+
+        template_params = self._get_template_parameters()
+
+        if template_params is not None:
+            for param in template_params:
+                data[param["name"]] = param["value"]
 
         return data
 
