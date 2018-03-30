@@ -28,7 +28,7 @@ from subprocess import Popen, PIPE
 from termcolor import colored
 
 from mlt.commands import Command
-from mlt.utils import (build_helpers, config_helpers, files,
+from mlt.utils import (build_helpers, config_helpers, constants, files,
                        kubernetes_helpers, progress_bar, process_helpers)
 
 
@@ -55,8 +55,9 @@ class DeployCommand(Command):
         for filename in os.listdir("k8s-templates"):
             with open(os.path.join('k8s-templates', filename)) as f:
                 template = Template(f.read())
-                out = template.substitute(image=remote_container_name,
-                                          app=app_name, run=str(uuid.uuid4()))
+                out = template.substitute(
+                    image=remote_container_name, app=app_name, run=str(uuid.uuid4()),
+                    **self.config[constants.TEMPLATE_PARAMETERS])
 
                 with open(os.path.join('k8s', filename), 'w') as f:
                     f.write(out)

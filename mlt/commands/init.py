@@ -28,7 +28,7 @@ import traceback
 
 from mlt import TEMPLATES_DIR
 from mlt.commands import Command
-from mlt.utils import process_helpers, git_helpers, files
+from mlt.utils import constants, process_helpers, git_helpers
 
 
 class InitCommand(Command):
@@ -50,8 +50,10 @@ class InitCommand(Command):
             try:
                 shutil.copytree(templates_directory, self.app_name)
 
-                data = self._build_mlt_json()
-                with open(os.path.join(self.app_name, 'mlt.json'), 'w') as f:
+                template_params = self._get_template_parameters(templates_directory)
+                data = self._build_mlt_json(template_params)
+                with open(os.path.join(self.app_name,
+                                       constants.MLT_CONFIG_FILE), 'w') as f:
                     json.dump(data, f, indent=2)
                 self._init_git_repo()
             except OSError as exc:
@@ -64,18 +66,22 @@ class InitCommand(Command):
 
                 sys.exit(1)
 
-    def _get_template_parameters(self):
+    def _get_template_parameters(self, templates_directory):
         """
-        Returns template-specific parameters from the parameters.json file
+        Returns template-specific parameters from the template config file
+        in the app directory.  
         """
-        parameters_file = "parameters.json"
+        parameters_file = os.path.join(templates_directory,
+                                       constants.TEMPLATE_CONFIG_FILE)
 
+        params = None
         if os.path.isfile(parameters_file):
             with open(parameters_file) as f:
-                return json.load(f).get("parameters")
-        return None
+                params = json.load(f).get("parameters")
 
-    def _build_mlt_json(self):
+        return params
+
+    def _build_mlt_json(self, template_parameters):
         """generates the data to write to mlt.json"""
         data = {'name': self.app_name, 'namespace': self.app_name}
         if not self.args["--registry"]:
@@ -91,11 +97,11 @@ class InitCommand(Command):
         else:
             data['namespace'] = self.args["--namespace"]
 
-        template_params = self._get_template_parameters()
-
-        if template_params is not None:
-            for param in template_params:
-                data[param["name"]] = param["value"]
+        # Add template specific parameters to the data dictionary
+        if template_parameters:
+            template_data = data[constants.TEMPLATE_PARAMETERS] = {}
+            for param in template_parameters:
+                template_data[param["name"]] = param["value"]
 
         return data
 

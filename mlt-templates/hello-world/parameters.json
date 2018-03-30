@@ -1,5 +1,5 @@
 {
-  "parameters" : [
-       { "name": "greeting", "description": "TensorFlow flag specifying the greeting to use", "value": "Hello" }
+  "template_parameters" : [
+       { "name": "greeting", "value": "Hello" }
   ]
 }

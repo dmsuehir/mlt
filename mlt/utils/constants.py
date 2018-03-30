@@ -18,18 +18,12 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-import json
-import os
-import sys
-from mlt.utils import constants
 
+# Config file name
+MLT_CONFIG_FILE = "mlt.json"
 
-def load_config():
-    """stores mlt.json data in self.config"""
-    if os.path.isfile(constants.MLT_CONFIG_FILE):
-        with open(constants.MLT_CONFIG_FILE) as f:
-            return json.load(f)
-    else:
-        print("This command requires you to be in an `mlt init` "
-              "built directory.")
-        sys.exit(1)
+# Template parameters file name
+TEMPLATE_CONFIG_FILE = "parameters.json"
+
+# Name of config file section that has template parameters
+TEMPLATE_PARAMETERS = "template_parameters"

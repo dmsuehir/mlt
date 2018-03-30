@@ -21,15 +21,13 @@
 from __future__ import print_function
 
 import tensorflow as tf
+import os
 
-FLAGS = tf.app.flags.FLAGS
-
-tf.app.flags.DEFINE_string("greeting", "Hello", "Greeting to use")
-
-hello = tf.constant('{}, TensorFlow!'.format(FLAGS.greeting))
+greeting = os.environ.get("GREETING", "Hello")
+message = tf.constant('{}, TensorFlow!'.format(greeting))
 
 # Start tf session
 sess = tf.Session()
 
 # Run the op
-print(sess.run(hello))
+print(sess.run(message))
