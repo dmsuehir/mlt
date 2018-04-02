@@ -43,36 +43,8 @@ class DeployCommand(Command):
             print("Skipping image push")
         else:
             self._push()
-<<<<<<< HEAD
 
-        app_name = self.config['name']
-        namespace = self.config['namespace']
-        remote_container_name = files.fetch_action_arg(
-            'push', 'last_remote_container')
-
-        print("Deploying {}".format(remote_container_name))
-
-        # Write new container to deployment
-        for filename in os.listdir("k8s-templates"):
-            with open(os.path.join('k8s-templates', filename)) as f:
-                template = Template(f.read())
-                out = template.substitute(
-                    image=remote_container_name, app=app_name, run=str(uuid.uuid4()),
-                    **self.config[constants.TEMPLATE_PARAMETERS])
-
-                with open(os.path.join('k8s', filename), 'w') as f:
-                    f.write(out)
-
-            kubernetes_helpers.ensure_namespace_exists(namespace)
-            process_helpers.run(
-                ["kubectl", "--namespace", namespace, "apply", "-R",
-                 "-f", "k8s"])
-
-            print("\nInspect created objects by running:\n"
-                  "$ kubectl get --namespace={} all\n".format(namespace))
-=======
         self._deploy_new_container()
->>>>>>> 896654099af010a8afd80b613b0b6ec96633e401
 
     def _push(self):
         last_push_duration = files.fetch_action_arg(
