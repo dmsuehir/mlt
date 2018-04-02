@@ -33,3 +33,13 @@ def load_config():
         print("This command requires you to be in an `mlt init` "
               "built directory.")
         sys.exit(1)
+
+
+def get_template_parameters(config_dict):
+    """
+    Returns dictionary of template parameters, if it exists in the specified
+    config.  Otherwise, returns empty dictionary.
+    """
+    return config_dict[constants.TEMPLATE_PARAMETERS] \
+        if config_dict and constants.TEMPLATE_PARAMETERS in config_dict \
+        else {}

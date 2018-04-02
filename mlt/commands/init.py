@@ -75,7 +75,7 @@ class InitCommand(Command):
     def _get_template_parameters(self, templates_directory):
         """
         Returns template-specific parameters from the template config file
-        in the app directory.  
+        in the app directory.
         """
         parameters_file = os.path.join(templates_directory,
                                        constants.TEMPLATE_CONFIG)
