@@ -16,6 +16,7 @@
 #
 
 SHELL=bash
+PY := $(shell python --version 2>&1  | cut -c8)
 
 .PHONY: venv test lint clean
 
@@ -43,11 +44,11 @@ coverage:
 
 install:
 	@echo "Installing mlt to system..."
-	@python setup.py install
+	@python${PY} setup.py install
 
 uninstall:
 	@echo "Uninstalling mlt from system..."
-	@python setup.py uninstall
+	@pip${PY} uninstall -y mlt
 
 docker:
 	docker build \
@@ -70,6 +71,13 @@ test-e2e: env-up
 	docker-compose exec test kubectl cluster-info
 	docker-compose exec test pip install tox
 	docker-compose exec test tox -e py2-e2e -e py3-e2e
+
+# EXTRA_ARGS enables usage of other docker registries for testing
+# ex: EXTRA_ARGS=`$MLT_REGISTRY_AUTH_COMMAND` make test-e2e-no-docker
+# if you'd like to use something other than localhost:5000, also set
+# MLT_REGISTRY env var and that'll be respected by tox
+test-e2e-no-docker:
+	@${EXTRA_ARGS:} tox -e py2-e2e -e py3-e2e
 
 clean:
 	rm -rf .venv .venv3
