@@ -20,10 +20,10 @@
 
 
 # Config file name
-MLT_CONFIG_FILE = "mlt.json"
+MLT_CONFIG = "mlt.json"
 
 # Template parameters file name
-TEMPLATE_CONFIG_FILE = "parameters.json"
+TEMPLATE_CONFIG = "parameters.json"
 
 # Name of config file section that has template parameters
 TEMPLATE_PARAMETERS = "template_parameters"

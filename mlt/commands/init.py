@@ -22,7 +22,7 @@ import getpass
 import json
 import os
 import sys
-import shutil
+from shutil import copytree, ignore_patterns
 from subprocess import check_output
 import traceback
 
@@ -48,12 +48,18 @@ class InitCommand(Command):
                 temp_clone, TEMPLATES_DIR, template_name)
 
             try:
-                shutil.copytree(templates_directory, self.app_name)
+                # The template configs get pulled into the mlt.json file, so
+                # don't grab a copy of that in the app directory
+                copytree(templates_directory, self.app_name,
+                         ignore=ignore_patterns(constants.TEMPLATE_CONFIG))
 
-                template_params = self._get_template_parameters(templates_directory)
+                # Get the template configs from the template and include them
+                # when building the mlt json file
+                template_params = self._get_template_parameters(
+                    templates_directory)
                 data = self._build_mlt_json(template_params)
                 with open(os.path.join(self.app_name,
-                                       constants.MLT_CONFIG_FILE), 'w') as f:
+                                       constants.MLT_CONFIG), 'w') as f:
                     json.dump(data, f, indent=2)
                 self._init_git_repo()
             except OSError as exc:
@@ -72,12 +78,11 @@ class InitCommand(Command):
         in the app directory.  
         """
         parameters_file = os.path.join(templates_directory,
-                                       constants.TEMPLATE_CONFIG_FILE)
-
+                                       constants.TEMPLATE_CONFIG)
         params = None
         if os.path.isfile(parameters_file):
             with open(parameters_file) as f:
-                params = json.load(f).get("parameters")
+                params = json.load(f).get(constants.TEMPLATE_PARAMETERS)
 
         return params
 

@@ -25,4 +25,4 @@ ADD . /src/app
 
 RUN pycodestyle -v .
 
-ENTRYPOINT [ "python", "main.py", "--greeting", "Yo" ]
+ENTRYPOINT [ "python", "main.py" ]

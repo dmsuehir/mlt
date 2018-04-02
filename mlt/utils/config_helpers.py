@@ -26,8 +26,8 @@ from mlt.utils import constants
 
 def load_config():
     """stores mlt.json data in self.config"""
-    if os.path.isfile(constants.MLT_CONFIG_FILE):
-        with open(constants.MLT_CONFIG_FILE) as f:
+    if os.path.isfile(constants.MLT_CONFIG):
+        with open(constants.MLT_CONFIG) as f:
             return json.load(f)
     else:
         print("This command requires you to be in an `mlt init` "
