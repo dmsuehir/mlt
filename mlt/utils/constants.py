@@ -30,3 +30,6 @@ TEMPLATE_CONFIG = "parameters.json"
 
 # Name of config file section that has template parameters
 TEMPLATE_PARAMETERS = "template_parameters"
+
+# Name of the file that list required CRDs
+CRD_CHECK_FILE = "crd-requirements.txt"

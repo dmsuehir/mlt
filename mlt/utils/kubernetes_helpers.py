@@ -24,7 +24,7 @@ import json
 
 from subprocess import call
 
-from mlt.utils import process_helpers
+from mlt.utils import constants, process_helpers
 
 
 def ensure_namespace_exists(ns):
@@ -36,9 +36,9 @@ def ensure_namespace_exists(ns):
 
 def check_crds(exit_on_failure=False, app_name=None):
     if app_name is None:
-        crd_file = 'crd-requirements.txt'
+        crd_file = constants.CRD_CHECK_FILE
     else:
-        crd_file = os.path.join(app_name, 'crd-requirements.txt')
+        crd_file = os.path.join(app_name, constants.CRD_CHECK_FILE)
     if os.path.exists(crd_file):
         with open(crd_file) as f:
             # using f.read().splitlines() instead of f.readlines()
@@ -60,7 +60,8 @@ def check_crds(exit_on_failure=False, app_name=None):
             if exit_on_failure:
                 sys.exit(1)
     else:
-        print('file does not exits: {}'.format(crd_file))
+        print("Skipping CRD check, because the '{}' file does not exist.".
+              format(crd_file))
 
 
 def checking_crds_on_k8(crd_set):

@@ -21,7 +21,8 @@
 import uuid
 from mock import patch
 
-from mlt.utils.kubernetes_helpers import ensure_namespace_exists
+from mlt.utils.kubernetes_helpers import check_crds, ensure_namespace_exists
+from test_utils.io import catch_stdout
 
 
 @patch('mlt.utils.kubernetes_helpers.call')
@@ -42,3 +43,12 @@ def test_ensure_namespace_already_exists(proc_helpers, open_mock, call):
 
     ensure_namespace_exists(str(uuid.uuid4()))
     proc_helpers.run.assert_called_once()
+
+
+def test_crd_check_file_does_not_exist():
+    with catch_stdout() as caught_output:
+        check_crds(False, "foo")
+        output = caught_output.getvalue().lower()
+
+    assert "skipping crd check" in output
+    assert "does not exist" in output
